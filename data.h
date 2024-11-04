@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 struct UserInfo {
-	UserInfo():name(""), pwd(""),uid(0),email(""),nick(""),desc(""),sex(0) {}
+	UserInfo():name(""), pwd(""),uid(0),email(""),nick(""),desc(""),sex(0), icon("") {}
 	std::string name;
 	std::string pwd;
 	int uid;
@@ -9,6 +9,8 @@ struct UserInfo {
 	std::string nick;
 	std::string desc;
 	int sex;
+	std::string icon;
+	std::string back;
 };
 
 struct ApplyInfo {
@@ -23,4 +25,5 @@ struct ApplyInfo {
 	std::string _icon;
 	std::string _nick;
 	int _sex;
+	int _status;
 };

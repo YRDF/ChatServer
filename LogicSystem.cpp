@@ -126,6 +126,7 @@ void LogicSystem::LoginHandler(shared_ptr<CSession> session, const short &msg_id
 	rtvalue["nick"] = user_info->nick;
 	rtvalue["desc"] = user_info->desc;
 	rtvalue["sex"] = user_info->sex;
+	rtvalue["icon"] = user_info->icon;
 
 	//从数据库获取申请列表
 	std::vector<std::shared_ptr<ApplyInfo>> apply_list;
@@ -221,11 +222,46 @@ void LogicSystem::AddFriendApply(std::shared_ptr<CSession> session, const short&
 		return;
 	}
 
+	auto& cfg = ConfigMgr::Inst();
+	auto self_name = cfg["SelfServer"]["Name"];
+
+
+	std::string base_key = USER_BASE_INFO + std::to_string(uid);
+	auto apply_info = std::make_shared<UserInfo>();
+	bool b_info = GetBaseInfo(base_key, uid, apply_info);
+
+	//直接通知对方有申请消息
+	if (to_ip_value == self_name) {
+		auto session = UserMgr::GetInstance()->GetSession(touid);
+		if (session) {
+			//在内存中则直接发送通知对方
+			Json::Value  notify;
+			notify["error"] = ErrorCodes::Success;
+			notify["applyuid"] = uid;
+			notify["name"] = applyname;
+			notify["desc"] = "";
+			//if (b_info) {
+			//	notify["icon"] = apply_info->icon;
+			//	notify["sex"] = apply_info->sex;
+			//	notify["nick"] = apply_info->nick;
+			//}
+			std::string return_str = notify.toStyledString();
+			session->Send(return_str, ID_NOTIFY_ADD_FRIEND_REQ);
+		}
+
+		return;
+	}
+
 	AddFriendReq add_req;
 	add_req.set_applyuid(uid);
 	add_req.set_touid(touid);
 	add_req.set_name(applyname);
 	add_req.set_desc("");
+		if (b_info) {
+		add_req.set_icon(apply_info->icon);
+		add_req.set_sex(apply_info->sex);
+		add_req.set_nick(apply_info->nick);
+	}
 
 	//发送通知
 	ChatGrpcClient::GetInstance()->NotifyAddFriend(to_ip_value,add_req);

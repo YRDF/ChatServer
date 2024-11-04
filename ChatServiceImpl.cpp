@@ -11,7 +11,8 @@ ChatServiceImpl::ChatServiceImpl()
 
 }
 
-Status ChatServiceImpl::NotifyAddFriend(ServerContext* context, const AddFriendReq* request, AddFriendRsp* reply)
+Status ChatServiceImpl::NotifyAddFriend(ServerContext* context, const AddFriendReq* request,
+	AddFriendRsp* reply)
 {
 	//查找用户是否在本服务器
 	auto touid = request->touid();
@@ -27,13 +28,16 @@ Status ChatServiceImpl::NotifyAddFriend(ServerContext* context, const AddFriendR
 	if (session == nullptr) {
 		return Status::OK;
 	}
-	
+
 	//在内存中则直接发送通知对方
 	Json::Value  rtvalue;
 	rtvalue["error"] = ErrorCodes::Success;
 	rtvalue["applyuid"] = request->applyuid();
 	rtvalue["name"] = request->name();
 	rtvalue["desc"] = request->desc();
+	rtvalue["icon"] = request->icon();
+	rtvalue["sex"] = request->sex();
+	rtvalue["nick"] = request->nick();
 
 	std::string return_str = rtvalue.toStyledString();
 
